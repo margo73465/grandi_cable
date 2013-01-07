@@ -48,11 +48,11 @@ const double pi = 3.141592653589793;
 
 /* Stimulation parameters */
 const double dt_max = 0.01;
-const double T = 1000.;   //BCL
+//const double T = 1000.;   //BCL
 const double t_end = 10000.-.01; 
 const double stim_dur = 1.0;
 const double stim_amp = -48.0;
-const int N_BCL = 100000;  // BCL/dt
+//const int N_BCL = 100000;  // BCL/dt
 const int N_stim = 100;    // stim_dur/dt
 
 /* Cable parameters */
@@ -185,11 +185,14 @@ int main() {
   double linext, Vt, Vtab[tl][34], etab[34];   
   double APDstart=0., dVmax=0., CVstart;
   double V_max = -100.0, V_low = 100.0, V_90; 
-	
+
+  long int n=0;
   int z, i = 0, ti, ii, k = 1, cc;
-  int n_BCL = N_BCL, N = -1;
-  int n_stim = 1;
-  int stim_on = 0;
+  // int n_BCL = N_BCL, 
+  int N = 0;
+  // int n_stim = 1;
+  // int stim_on = 0;
+  int N_BCL = 100000; //BCL/dt
 	
   double Vo[DIM], gate_m[DIM], gate_h[DIM], gate_j[DIM], gate_d[DIM], gate_f[DIM], gate_gj[DIM], gate_gsl[DIM];
   double gate_ml[DIM], gate_hl[DIM], gate_xto[DIM], gate_yto[DIM], gate_xr[DIM], gate_xs[DIM];
@@ -344,7 +347,7 @@ int main() {
 	
   while (t < t_end) {
 
-    /* compute stimulus current */
+    /* compute stimulus current 
     Istim = 0.0;
     if (n_BCL == N_BCL) {
       stim_on = 1;
@@ -353,12 +356,16 @@ int main() {
     }
     if (n_stim <= N_stim && stim_on == 1) {
       Istim = stim_amp;
-      n_stim ++;
-    }
+      n_stim ++; 
+   }
     if (n_stim == N_stim) {
       stim_on = 0;
       n_stim = 1;
-    }
+      } */
+    
+    if(n%N_BCL == 0) N++;
+    if(n%N_BCL <= N_stim) Istim = stim_amp;
+    else Istim = 0.0;
 
 	  
     /* ODE all inner grid points */
@@ -713,11 +720,15 @@ int main() {
 	  fprintf(outputI2,"%.1f\t%f\t%f\t%f\t%f\n",t,Ki[rec1],Ki[rec2],INa1,INa2);
 	  i=0;
 	}
-	  
-    t = N*T + n_BCL*dt_max;
-    n_BCL++;
+
+
+	n++;
+	t=n*dt_max;
+    
+    //t = N*T + n_BCL*dt_max;
+    //n_BCL++;
     //if (t<2.*T) i++;
-    if (t>t_end-2T) i++;
+    //if (t>t_end-2T) i++;
 	  
   }
 

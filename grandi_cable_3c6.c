@@ -493,11 +493,20 @@ int main() {
 	  	  
 	  // I_Ca: L-type Calcium Current
 	  temp = Vo[z]*Frdy*FoRT;
-	  ibarca_j = pCa*4.*temp * (0.341*Caj[z]*etab[31]-0.341*Cao) /(etab[31]-1.);
-	  ibarca_sl = pCa*4.*temp * (0.341*Casl[z]*etab[31]-0.341*Cao) /(etab[31]-1.);
-	  ibark = pK*temp*(0.75*Ki[z]*etab[32]-0.75*Ko) /(etab[32]-1.);
-	  ibarna_j = pNa*temp *(0.75*Naj[z]*etab[32]-0.75*Nao) /(etab[32]-1.);
-	  ibarna_sl = pNa*temp *(0.75*Nasl[z]*etab[32]-0.75*Nao) /(etab[32]-1.);
+	  if (abs(Vo[z])<.01) {
+		ibarca_j = pCa*2.*Frdy*0.341*(Caj[z]*etab[31]-Cao+Vo[z]*FoRT*2.*Caj[z]*etab[31])/etab[31]; 
+		ibarca_sl = pCa*2.*Frdy*0.341*(Casl[z]*etab[31]-Cao+Vo[z]*FoRT*2.*Casl[z]*etab[31])/etab[31]; 
+		ibark = pK*Frdy*0.75*(Ki[z]*etab[32]-Ko+Vo[z]*FoRT*Ki[z]*etab[32])/etab[32]; 
+		ibarna_j = pNa*Frdy*0.75*(Naj[z]*etab[32]-Nao+Vo[z]*FoRT*Naj[z]*etab[32])/etab[32]; 
+		ibarna_sl = pNa*Frdy*0.75*(Nasl[z]*etab[32]-Nao+Vo[z]*FoRT*Nasl[z]*etab[32])/etab[32]; 
+	  }
+	  else {
+		ibarca_j = pCa*4.*temp*0.341*(Caj[z]*etab[31]-Cao)/(etab[31]-1.);
+		ibarca_sl = pCa*4.*temp*0.341*(Casl[z]*etab[31]-Cao)/(etab[31]-1.);	
+		ibark = pK*temp*0.75*(Ki[z]*etab[32]-Ko)/(etab[32]-1.);
+		ibarna_j = pNa*temp*0.75*(Naj[z]*etab[32]-Nao)/(etab[32]-1.);
+		ibarna_sl = pNa*temp*0.75*(Nasl[z]*etab[32]-Nao)/(etab[32]-1.);
+	  }
 	  I_Ca_junc = (Fjunc_CaL*ibarca_j*gate_d[z]*gate_f[z]*(1.-gate_gj[z]))*0.45;
 	  I_Ca_sl = (Fsl_CaL*ibarca_sl*gate_d[z]*gate_f[z]*((1.-gate_gsl[z])))*0.45;
 	  I_Ca = I_Ca_junc+I_Ca_sl;
